@@ -9,11 +9,19 @@
 //#define DHTTYPE DHT11
 //#define DHTPIN 19
 
-#define DHTTYPE DHT22 // DHT 22 (AM2302)
+#ifdef ARDUINO_ESP8266_WEMOS_D1MINI
+#define DHTPIN D5
+#endif
+
+#ifdef ARDUINO_ESP32_DEV
 #define DHTPIN 23
+#endif
+
+#define DHTTYPE DHT22 // DHT 22 (AM2302)
 DHT dht(DHTPIN, DHTTYPE);
 
 SH1106Wire display(0x3c, SDA, SCL); // ADDRESS, SDA, SCL
+
 
 const int x_pin = 34,
           button_pin = 35;
