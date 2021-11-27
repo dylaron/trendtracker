@@ -107,19 +107,9 @@ void loop()
     {
       display.drawString(xc, y_3row, String(rh_rate));
       display.print(rh_rate);
-      xc = x_2col + 10;
-
-      float thr1 = 0.08, thr2 = 0.5;
-      if (rh_rate < -thr2)
-        display.drawString(xc, y_2row, "<<");
-      else if (rh_rate > thr2)
-        display.drawString(xc, y_2row, ">>");
-      else if (rh_rate < -thr1)
-        display.drawString(xc, y_2row, "<");
-      else if (rh_rate > thr1)
-        display.drawString(xc, y_2row, ">");
-      else
-        display.drawString(xc, y_2row, "-");
+      int8_t xl = x_2col + 10;
+      int8_t yl = 32;
+      display.drawLine(xl, yl, xl + 10, yl - (int)rh_rate * 10);
     }
     display.display();
   }
