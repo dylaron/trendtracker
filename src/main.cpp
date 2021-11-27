@@ -3,7 +3,6 @@
 #include <SH1106Wire.h>
 #include <DHT.h> // Digital relative humidity & temperature sensor AM2302/DHT22
 #include "SlopeTracker.h"
-// #include "DFRobot_LCD.h"
 
 
 #define TIME_STEP_DISP 1000
@@ -15,7 +14,6 @@
 #define DHTPIN 23
 DHT dht(DHTPIN, DHTTYPE);
 
-// DFRobot_LCD lcd(16, 2);
 SH1106Wire lcd(0x3c, SDA, SCL); // ADDRESS, SDA, SCL
 
 const int x_pin = 34,
