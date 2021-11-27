@@ -107,9 +107,8 @@ void loop()
     {
       display.drawString(xc, y_3row, String(rh_rate));
       display.print(rh_rate);
-      int8_t xl = x_2col + 10;
-      int8_t yl = 32;
-      display.drawLine(xl, yl, xl + 10, yl - (int)rh_rate * 10);
+      int8_t xl = x_2col + 10, yl = 32, k = 5;
+      display.drawLine(xl, yl + (int)rh_rate * k, xl + 10, yl - (int)(rh_rate * (float)k));
     }
     display.display();
   }
