@@ -4,7 +4,6 @@
 #include <DHT.h> // Digital relative humidity & temperature sensor AM2302/DHT22
 #include "SlopeTracker.h"
 
-
 #define TIME_STEP_DISP 1000
 //
 //#define DHTTYPE DHT11
@@ -14,7 +13,7 @@
 #define DHTPIN 23
 DHT dht(DHTPIN, DHTTYPE);
 
-SH1106Wire lcd(0x3c, SDA, SCL); // ADDRESS, SDA, SCL
+SH1106Wire display(0x3c, SDA, SCL); // ADDRESS, SDA, SCL
 
 const int x_pin = 34,
           button_pin = 35;
@@ -25,33 +24,35 @@ const uint16_t trend_sample_time = 1000;                      // ms
 SlopeTracker rh_short_buffer(4, avg_sample_time / 60000.0);   // 4 data points, 0.25 second each
 SlopeTracker rh_long_buffer(30, trend_sample_time / 60000.0); // 60 data points, 0.5 minutes each
 unsigned long avg_timer_due = 0, trend_timer_due = 0;
-uint8_t x_1col = 46, x_2col = 100, y_1row = 12, y_2row = 32;
+uint8_t x_1col = 46, x_2col = 100, y_1row = 8, y_2row = 26, y_3row = 44;
 
 void draw_background()
 {
-  lcd.setFont(ArialMT_Plain_16);
-  lcd.setTextAlignment(TEXT_ALIGN_RIGHT);
-  lcd.drawString(x_1col, y_1row, " RH=");
-  lcd.drawString(x_1col, y_2row, "dRH=");
-  lcd.setFont(ArialMT_Plain_10);
-  lcd.setTextAlignment(TEXT_ALIGN_LEFT);
-  lcd.drawString(x_2col, y_1row, "%");
-  lcd.drawString(x_2col, y_2row, "%/Min");
+  display.setFont(ArialMT_Plain_16);
+  display.setTextAlignment(TEXT_ALIGN_RIGHT);
+  display.drawString(x_1col, y_1row, "Tmp=");
+  display.drawString(x_1col, y_2row, " RH=");
+  display.drawString(x_1col, y_3row, "dRH=");
+  display.setFont(ArialMT_Plain_10);
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.drawString(x_2col, y_1row, "'C");
+  display.drawString(x_2col, y_2row, "%");
+  display.drawString(x_2col, y_3row, "%/Min");
 }
 
 void setup()
 {
   Serial.begin(9600);
-  lcd.init();
-  lcd.flipScreenVertically();
-  // lcd.setColor(WHITE);
-  lcd.clear();
+  display.init();
+  display.flipScreenVertically();
+  // display.setColor(WHITE);
+  display.clear();
   draw_background();
   pinMode(x_pin, INPUT);
   pinMode(button_pin, INPUT);
-  // lcd.displayOn();
-  lcd.setTextAlignment(TEXT_ALIGN_LEFT);
-  lcd.display();
+  // display.displayOn();
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.display();
 
   dht.begin();
 }
@@ -95,32 +96,31 @@ void loop()
   if (millis() > time_next_d)
   {
     time_next_d += TIME_STEP_DISP;
-    uint16_t xc = 48;
-    lcd.clear();
+    uint16_t xc = x_1col + 2;
+    display.clear();
     draw_background();
-    lcd.setFont(ArialMT_Plain_16);
-    lcd.drawString(xc, y_1row, "     ");
-    lcd.drawString(xc, y_1row, String(rh_realtime));
+    display.setFont(ArialMT_Plain_16);
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.drawString(xc, y_1row, String(temp_realtime));
+    display.drawString(xc, y_2row, String(rh_1s_mva));
     if (rh_long_buffer.ready())
     {
-      lcd.drawString(xc, y_2row, "    ");
-      lcd.drawString(xc, y_2row, String(rh_rate));
-      lcd.print(rh_rate);
-      xc = 64;
-      /*
-            float thr1 = 0.08, thr2 = 0.5;
-            if (rh_rate < -thr2)
-              lcd.drawString(xc, y_1row, "<<");
-            else if (rh_rate > thr2)
-              lcd.drawString(xc, y_1row, ">>");
-            else if (rh_rate < -thr1)
-              lcd.drawString(xc, y_1row, "<");
-            else if (rh_rate > thr1)
-              lcd.drawString(xc, y_1row, ">");
-            else
-              lcd.drawString(xc, y_1row, "-");
-              */
+      display.drawString(xc, y_3row, String(rh_rate));
+      display.print(rh_rate);
+      xc = x_2col + 10;
+
+      float thr1 = 0.08, thr2 = 0.5;
+      if (rh_rate < -thr2)
+        display.drawString(xc, y_2row, "<<");
+      else if (rh_rate > thr2)
+        display.drawString(xc, y_2row, ">>");
+      else if (rh_rate < -thr1)
+        display.drawString(xc, y_2row, "<");
+      else if (rh_rate > thr1)
+        display.drawString(xc, y_2row, ">");
+      else
+        display.drawString(xc, y_2row, "-");
     }
-    lcd.display();
+    display.display();
   }
 }
